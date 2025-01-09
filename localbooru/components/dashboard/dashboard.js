@@ -5,7 +5,7 @@ export default function Dashboard() {
 
 
     return <>
-        <div className="content-center flex-auto w-full mx-auto relative align-middle p-10">
+        <div className="p-10">
             <div className="justify-center flex p-1">
                 <Image src="/images/Al_Sneed.png" alt={"Sneedem Feedem!"} width={100} height={100} className={"justify-center"} />
             </div>

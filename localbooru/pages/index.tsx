@@ -10,21 +10,21 @@ export default function Home() {
 
 
   return (
-      <div className={"min-h-screen flex flex-col"}>
-          <div className={"flex-auto"}>
-              <main>
+          <div className={"flex-auto flex flex-col min-h-dvh"}>
+              <main className={"flex-grow flex-col min-h-0.5dvh"}>
                   <Dashboard/>
               </main>
-              <footer className={"align-baseline justify-content-center"}>
-                  <ThemeProvider>
-                      <ThemeSwitcher/>
-                  </ThemeProvider>
+              <footer>
+                  <div className={"flex items-center flex-col mt-auto"}>
+                      <ThemeProvider>
+                          <ThemeSwitcher/>
+                      </ThemeProvider>
 
 
-                  <p>All rights resnerved</p>
+                      <p>All rights resnerved</p>
+                  </div>
               </footer>
           </div>
-      </div>
 
   );
 }
