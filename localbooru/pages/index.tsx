@@ -10,18 +10,21 @@ export default function Home() {
 
 
   return (
-    <div>
-      <main>
-        <Dashboard/>
-      </main>
-      <footer>
-          <ThemeProvider>
-              <ThemeSwitcher/>
-          </ThemeProvider>
+      <div className={"min-h-screen flex flex-col"}>
+          <div className={"flex-auto"}>
+              <main>
+                  <Dashboard/>
+              </main>
+              <footer className={"align-baseline justify-content-center"}>
+                  <ThemeProvider>
+                      <ThemeSwitcher/>
+                  </ThemeProvider>
 
 
-          <p>All rights resnerved</p>
-      </footer>
-    </div>
+                  <p>All rights resnerved</p>
+              </footer>
+          </div>
+      </div>
+
   );
 }
