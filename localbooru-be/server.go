@@ -6,9 +6,14 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/hello", getHello)
 	http.HandleFunc("/posts", getPosts)
 	http.HandleFunc("/posts/{id}", getPostById)
 	http.ListenAndServe(":8080", nil)
+}
+
+func getHello(w http.ResponseWriter, _ *http.Request) {
+	fmt.Fprintf(w, "Hello World")
 }
 
 func getRoutes() {
