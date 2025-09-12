@@ -10,6 +10,7 @@ func main() {
 	http.HandleFunc("/posts", getPosts)
 	http.HandleFunc("/posts/{id}", getPostById)
 	http.ListenAndServe(":8080", nil)
+	println("Server started")
 }
 
 func getHello(w http.ResponseWriter, _ *http.Request) {
