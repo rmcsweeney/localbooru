@@ -9,7 +9,10 @@ import (
 
 func TestMain(m *testing.M) {
 	log.Println("Setting up mocks...")
-	InitMockDb()
+	repository = NewRepositoryImpl(NewMockPostRepository(true))
+	testMux := http.NewServeMux()
+	testMux.HandleFunc("/hello", getHello)
+	testMux.HandleFunc("/posts/{id}", getPostById)
 	log.Println("Running tests...")
 	m.Run()
 	log.Println("Tests complete.")
@@ -35,16 +38,19 @@ func TestHello(t *testing.T) {
 }
 
 func TestGetPostById(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/posts/1", nil)
+	req := httptest.NewRequest("GET", "/posts/1", nil)
 	rr := httptest.NewRecorder()
 
-	if status := rr.Code; status != http.StatusOK {
+	getPostById(rr, req)
+
+	if rr.Code != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+			rr.Code, http.StatusOK)
 	}
 
 	expected := ""
 	actual := rr.Body.String()
+	println(actual)
 	if actual != expected {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)

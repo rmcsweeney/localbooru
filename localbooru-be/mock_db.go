@@ -1,33 +1,50 @@
 package main
 
 import (
+	"context"
 	"errors"
+	"sync"
 )
 
-var post_db map[int]*Post
-var tag_db map[string]*Tag
-
-func InitMockDb() {
-	post_db = make(map[int]*Post)
-	post_db[1] = &Post{1, "test", "png", "test", "test", "2025-09-12T00:19:10Z"}
+type MockPostRepository struct {
+	mu    sync.RWMutex
+	posts map[int]*Post
+	tags  map[string]*Tag
 }
 
-func GetPostById(id int) (*Post, error) {
-	var post = post_db[id]
-	if post == nil {
+func NewMockPostRepository(seed bool) *MockPostRepository {
+	m := &MockPostRepository{
+		posts: make(map[int]*Post),
+		tags:  make(map[string]*Tag),
+	}
+	if seed {
+		m.posts[1] = &Post{1, "test", "png", "test", "test", "2025-09-12T00:19:10Z"}
+	}
+	return m
+}
+
+func (m *MockPostRepository) GetPostById(ctx context.Context, id int) (*Post, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	p := m.posts[id]
+	if p == nil {
 		return nil, errors.New("Post not found")
 	}
-	return post, nil
+	return p, nil
 }
 
-func CreatePost(post *Post) {
-
+func (m *MockPostRepository) CreatePost(ctx context.Context, post *Post) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.posts[post.ID] = post
 }
 
-func GetPostsByTag(tag string) []*Post {
-	return nil
+func (m *MockPostRepository) GetPostsByTag(ctx context.Context, tag string) ([]*Post, error) {
+	// For a richer mock, keep a post->tags or tag->post index; here we return empty.
+	return []*Post{}, nil
 }
 
-func GetTagsByPostId(id int) []*Tag {
-	return nil
+func (m *MockPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error) {
+	// For a richer mock, keep a post->tags mapping; here we return empty.
+	return []*Tag{}, nil
 }

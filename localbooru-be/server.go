@@ -1,15 +1,21 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
+var repository *RepositoryImpl
+
 func main() {
-	http.HandleFunc("/hello", getHello)
-	http.HandleFunc("/posts", getPosts)
-	http.HandleFunc("/posts/{id}", getPostById)
-	http.ListenAndServe(":8080", nil)
+	mux := http.NewServeMux()
+	repository = NewRepositoryImpl(NewMockPostRepository(true))
+	mux.HandleFunc("/hello", getHello)
+	mux.HandleFunc("/posts", getPosts)
+	mux.HandleFunc("/posts/{id}", getPostById)
+	http.ListenAndServe(":8080", mux)
 	println("Server started")
 }
 
@@ -26,8 +32,13 @@ func getPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPostById(w http.ResponseWriter, r *http.Request) {
-	postid := r.PathValue("id")
-
-	message := "postid is " + postid
-	fmt.Fprintf(w, message)
+	postId, _ := strconv.Atoi(r.PathValue("id"))
+	res, _ := repository.posts.GetPostById(r.Context(), postId)
+	w.Header().Set("Content-Type", "application/json")
+	println(res)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	r.Close = true
 }
