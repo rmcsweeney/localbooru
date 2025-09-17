@@ -24,9 +24,6 @@ type Post struct {
 	ID       int
 	FileName string
 	FileType string
-	//todo: remove filepaths depending on storage?
-	FilePath      string
-	ThumbnailPath string
 	//timestamps in ISO 8601 format
 	CreatedAt string
 }

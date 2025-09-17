@@ -1,8 +1,6 @@
 //import Image from "next/image";
 import Dashboard from "../components/dashboard/dashboard";
-import "../globals.css"
 import ThemeSwitcher from "../components/buttons/themeswitcher";
-import {ThemeProvider} from "next-themes";
 
 export default function Home() {
 
@@ -16,9 +14,7 @@ export default function Home() {
               </main>
               <footer>
                   <div className={"flex items-center flex-col mt-auto"}>
-                      <ThemeProvider>
-                          <ThemeSwitcher/>
-                      </ThemeProvider>
+                      <ThemeSwitcher/>
 
 
                       <p>All rights resnerved</p>

@@ -18,7 +18,7 @@ func NewMockPostRepository(seed bool) *MockPostRepository {
 		tags:  make(map[string]*Tag),
 	}
 	if seed {
-		m.posts[1] = &Post{1, "test", "png", "test", "test", "2025-09-12T00:19:10Z"}
+		m.posts[1] = &Post{1, "test", "png", "2025-09-12T00:19:10Z"}
 	}
 	return m
 }
