@@ -12,11 +12,10 @@ export default function Post() {
         CreatedAt: "",
     });
     const baseUrl = 'http://localhost:8080/'
-
     useEffect(() => {
         const fetchPost = async() => {
             try {
-                const res = await fetch(baseUrl + `posts/` + id);
+                const res = await fetch(baseUrl + `posts/` + "1");
                 const data = await res.json();
                 setPostData(data)
             } catch (error) {
@@ -25,19 +24,16 @@ export default function Post() {
         };
         fetchPost()
 
-    })
-    then(r => {
-        let mediaReader = r.body.getReader();
-        let image = mediaReader.read()
-    });
+    }, []);
 
     return (
         <>
             <h1>
                 Hello {id}!
             </h1>
+{/*
             <Image src={baseUrl + postData.FileType + "/" + postData.FileName}></Image>
+*/}
         </>
-
     )
 }

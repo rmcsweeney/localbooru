@@ -19,7 +19,11 @@ func main() {
 	mux.HandleFunc("/posts", getPosts)
 	mux.HandleFunc("/posts/{id}", getPostById)
 	mux.HandleFunc("/media/{type}/{file}", getMedia)
-	http.ListenAndServe(":8080", mux)
+	err := http.ListenAndServe(":8080", mux)
+	if err != nil {
+		println(err)
+		return
+	}
 	println("Server started")
 }
 
@@ -62,9 +66,13 @@ func getPostById(w http.ResponseWriter, r *http.Request) {
 	postId, _ := strconv.Atoi(r.PathValue("id"))
 	res, _ := repository.posts.GetPostById(r.Context(), postId)
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		println(err)
 		return
 	}
 	r.Close = true
