@@ -12,6 +12,7 @@ func TestMain(m *testing.M) {
 	repository = NewRepositoryImpl(NewMockPostRepository(true))
 	testMux := http.NewServeMux()
 	testMux.HandleFunc("/hello", getHello)
+	mux.HandleFunc("/posts", getPosts)
 	testMux.HandleFunc("/posts/{id}", getPostById)
 	log.Println("Running tests...")
 	m.Run()
@@ -55,4 +56,8 @@ func TestGetPostById(t *testing.T) {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)
 	}
+}
+
+func TestGetPosts(t *testing.T) {
+	//TODO
 }

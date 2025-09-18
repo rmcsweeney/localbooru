@@ -7,6 +7,7 @@ import (
 // todo: decide on including tags in GetPost returns
 type PostRepository interface {
 	GetPostById(ctx context.Context, id int) (*Post, error)
+	GetRecentPosts(ctx context.Context, loadSize int, offsetIndex int) ([]*Post, error)
 	CreatePost(ctx context.Context, post *Post)
 	GetPostsByTag(ctx context.Context, tag string) ([]*Post, error)
 	GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error)
