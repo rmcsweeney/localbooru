@@ -18,7 +18,7 @@ func main() {
 	mux.HandleFunc("/hello", getHello)
 	mux.HandleFunc("/posts", getPosts)
 	mux.HandleFunc("/posts/{id}", getPostById)
-	mux.HandleFunc("/media/{type}/{file}", getMedia)
+	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		println(err)

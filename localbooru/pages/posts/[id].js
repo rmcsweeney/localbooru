@@ -31,9 +31,9 @@ export default function Post() {
             <h1>
                 Hello {id}!
             </h1>
-{/*
-            <Image src={baseUrl + postData.FileType + "/" + postData.FileName}></Image>
-*/}
+
+            <img src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></img>
+
         </>
     )
 }
