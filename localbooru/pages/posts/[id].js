@@ -15,16 +15,21 @@ export default function Post() {
     useEffect(() => {
         const fetchPost = async() => {
             try {
-                const res = await fetch(baseUrl + `posts/` + "1");
+                // For some reason, this always happens once but we succeed after that
+                if (id === null || id === undefined) {
+                    throw (new Error("ID was null or undefined"));
+                }
+
+                const res = await fetch(baseUrl + `posts/` + id);
                 const data = await res.json();
                 setPostData(data)
             } catch (error) {
-                console.error('Error fetching post: ', error);
+                console.log('Error fetching post: ', error);
             }
         };
         fetchPost()
 
-    }, []);
+    }, [id]);
 
     return (
         <>
