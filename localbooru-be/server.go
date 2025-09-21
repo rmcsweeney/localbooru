@@ -16,7 +16,8 @@ func main() {
 	mux := http.NewServeMux()
 	repository = NewRepositoryImpl(NewMockPostRepository(true))
 	mux.HandleFunc("/hello", getHello)
-	mux.HandleFunc("/posts/{loadSize}/{offset}", getPosts)
+	mux.HandleFunc("/posts/{loadSize}/{offset}", getNPosts)
+	mux.HandleFunc("/posts", getRecentPosts)
 	mux.HandleFunc("/posts/{id}", getPostById)
 	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	err := http.ListenAndServe(":8080", mux)
@@ -27,6 +28,19 @@ func main() {
 	println("Server started")
 }
 
+func getRecentPosts(w http.ResponseWriter, r *http.Request) {
+	setResponseHeaders(w)
+	loadSize := 10
+	offset := 0
+	res, _ := repository.posts.GetRecentPosts(r.Context(), loadSize, offset)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		println(err)
+		return
+	}
+	r.Close = true
+}
+
 func getHello(w http.ResponseWriter, _ *http.Request) {
 	fmt.Fprintf(w, "Hello World")
 }
@@ -35,14 +49,11 @@ func getRoutes() {
 
 }
 
-func getPosts(w http.ResponseWriter, r *http.Request) {
+func getNPosts(w http.ResponseWriter, r *http.Request) {
 	loadSize, _ := strconv.Atoi(r.PathValue("loadSize"))
 	offset, _ := strconv.Atoi(r.PathValue("offset"))
 	res, _ := repository.posts.GetRecentPosts(r.Context(), loadSize, offset) //load 2 posts for now
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	setResponseHeaders(w)
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -78,10 +89,7 @@ func getMedia(w http.ResponseWriter, r *http.Request) {
 func getPostById(w http.ResponseWriter, r *http.Request) {
 	postId, _ := strconv.Atoi(r.PathValue("id"))
 	res, _ := repository.posts.GetPostById(r.Context(), postId)
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	setResponseHeaders(w)
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -91,10 +99,9 @@ func getPostById(w http.ResponseWriter, r *http.Request) {
 	r.Close = true
 }
 
-//TODO refactor header sets into this
-/*func setResponseHeaders(w http.ResponseWriter) {
+func setResponseHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-}*/
+}

@@ -12,7 +12,7 @@ func TestMain(m *testing.M) {
 	repository = NewRepositoryImpl(NewMockPostRepository(true))
 	testMux := http.NewServeMux()
 	testMux.HandleFunc("/hello", getHello)
-	mux.HandleFunc("/posts", getPosts)
+	testMux.HandleFunc("/posts", getNPosts)
 	testMux.HandleFunc("/posts/{id}", getPostById)
 	log.Println("Running tests...")
 	m.Run()

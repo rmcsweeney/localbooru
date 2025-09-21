@@ -9,7 +9,7 @@ export default function Post() {
     const baseUrl = 'http://localhost:8080/'
     
     // Images to load per click
-    const loadSize=4
+    const loadSize=6
     // Number of images loaded so far
     const [loadOffset, setLoadOffset] = useState(0);
     
@@ -31,11 +31,17 @@ export default function Post() {
         <p className={"text-orange-700 dark:text-emerald-200"} >
             Welcome to Localbooru!
         </p>
-        <button onClick={fetchPost}> Click to load {loadSize} image{loadSize == 1 ? "" : "s"}</button>
-        <div style={{ display:"flex",flexDirection:"row"}}>
-            {postData.map( (post, index) => {
-               return <img src={baseUrl + "assets/images" + "/" + post?.FileName + ".png"} key={index} />   
-            })}
+        <div className={"grid"}>
+            <input defaultValue={"Enter tags..."}></input>
         </div>
+        <div>
+            <button onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
+            <div className={"grid-cols-4 grid"} >
+                {postData.map( (post, index) => {
+                    return <Image className={"flex-auto"} width={300} height={300} src={baseUrl + "assets/images" + "/" + post?.FileName + ".png"} key={index} alt={post?.FileName} />
+                })}
+            </div>
+        </div>
+
     </>;
 }
