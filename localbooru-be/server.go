@@ -42,7 +42,10 @@ func getRecentPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 func getHello(w http.ResponseWriter, _ *http.Request) {
-	fmt.Fprintf(w, "Hello World")
+	_, err := fmt.Fprintf(w, "Hello World")
+	if err != nil {
+		return
+	}
 }
 
 func getRoutes() {
