@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import {useEffect, useState} from "react";
+import Link from "next/link";
 
 export default function Post() {
 
@@ -35,17 +36,23 @@ export default function Post() {
         <p className={"text-orange-700 dark:text-emerald-200"} >
             Welcome to Localbooru!
         </p>
-        <div className={"grid"}>
-            <input defaultValue={"Enter tags..."}></input>
-        </div>
-        <div>
-            <button onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
-            <div className={"grid-cols-4 grid"} >
-                {postData.map( (post, index) => {
-                    return <Image className={"flex-auto"} width={300} height={300} src={baseUrl + "assets/images" + "/" + post?.FileName + "." + post?.FileType} key={index} alt={post?.FileName} />
-                })}
+        <div className={"grid grid-cols-[20%_80%]"}>
+            <div className={"m-1"}>
+                <button className={"border-4 border-b-cyan-700 mb-1"} onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
+                <input defaultValue={"Enter tags..."}></input>
             </div>
+            <div>
+                <div className={"grid-cols-4 grid"} >
+                    {postData.map( (post, index) => {
+                        return <Link href={"/posts/" + post?.ID} key={post?.ID}>
+                            <Image className={"flex-auto"} width={300} height={300} src={baseUrl + "assets/images" + "/" + post?.FileName + "." + post?.FileType} key={index} alt={post?.FileName} />
+                        </Link>
+                    })}
+                </div>
+            </div>
+
         </div>
+
 
     </>;
 }
