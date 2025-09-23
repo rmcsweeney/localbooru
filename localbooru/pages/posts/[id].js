@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import {useEffect, useState} from "react";
+import Image from "next/image";
 
 export default function Post() {
     const router = useRouter();
@@ -33,12 +34,26 @@ export default function Post() {
 
     return (
         <>
-            <h1>
-                Hello {id}!
-            </h1>
+            <div>
+                <h1>
+                    Hello {id}!
+                </h1>
+            </div>
 
-            <img src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></img>
+            <div className={"grid grid-cols-[20%_80%]"}>
+                <div>
+                    <div>
+                        <p>
+                            Created at: {postData.CreatedAt}
+                        </p>
+                    </div>
+                </div>
+                <div className={"m-4 border-4 border-b-cyan-700"}>
+                    <Image width={500} height={500}
+                           alt={"post"} src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></Image>
 
+                </div>
+            </div>
         </>
     )
 }
