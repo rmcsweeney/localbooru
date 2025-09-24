@@ -27,10 +27,29 @@ type Post struct {
 	FileType string
 	//timestamps in ISO 8601 format
 	CreatedAt string
+	Tags      []*Tag
 }
 
 type Tag struct {
 	ID    int
 	Name  string
 	Count int
+}
+
+func (p *Post) hasTagID(id int) bool {
+	for _, tag := range p.Tags {
+		if tag.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (p *Post) hasTagString(tagString string) bool {
+	for _, tag := range p.Tags {
+		if tag.Name == tagString {
+			return true
+		}
+	}
+	return false
 }
