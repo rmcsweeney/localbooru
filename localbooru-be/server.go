@@ -18,6 +18,7 @@ func main() {
 	mux.HandleFunc("/hello", getHello)
 	mux.HandleFunc("/posts/{loadSize}/{offset}", getNPosts)
 	mux.HandleFunc("/posts", getRecentPosts)
+	mux.HandleFunc("/posts/tag/{tag}", getPostsByTag)
 	mux.HandleFunc("/posts/{id}", getPostById)
 	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	err := http.ListenAndServe(":8080", mux)
@@ -33,6 +34,18 @@ func getRecentPosts(w http.ResponseWriter, r *http.Request) {
 	loadSize := 10
 	offset := 0
 	res, _ := repository.posts.GetRecentPosts(r.Context(), loadSize, offset)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		println(err)
+		return
+	}
+	r.Close = true
+}
+
+func getPostsByTag(w http.ResponseWriter, r *http.Request) {
+	setResponseHeaders(w)
+	tag := r.PathValue("tag")
+	res, _ := repository.posts.GetPostsByTag(r.Context(), tag)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		println(err)
