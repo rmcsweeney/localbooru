@@ -16,7 +16,7 @@ db.transaction do
     tags = db.prepare("INSERT INTO 
         tags (id, name, type, count)
         VALUES (?,?,?,?)")
-    tags.execute(1, "ouro_kronii," "character", 8)
+    tags.execute(1, "ouro_kronii", "character", 8)
     tags.execute(2, "none", "basic", 17)
     tags.execute(3, "other", "meta", 17)
     tags.execute(4, "hololive", "copyright", 8)

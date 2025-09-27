@@ -25,6 +25,16 @@ func (r *SqlPostRepository) GetPostById(ctx context.Context, id int) (*Post, err
 	if err != nil {
 		return nil, err
 	}
-	//TODO: Get tags
+	tags, err := r.db.Query("select t.name, t.type, t.count "+
+		"from tags t inner join post_tags pt on t.id = pt.tag_id "+
+		"where post_id = ?", id)
+	if err != nil {
+		log.Fatal("Issue getting tags: " + err.Error())
+	}
+	for tags.Next() {
+		var t Tag
+		_ = tags.Scan(&t.Name, &t.Type, &t.Count)
+		p.Tags = append(p.Tags)
+	}
 	return &p, nil
 }

@@ -11,8 +11,20 @@ import (
 )
 
 var repository *RepositoryImpl
+var config Config
+
+type Config struct {
+	UseMockDB bool `json:"UseMockDB"`
+}
 
 func main() {
+	file, _ := os.ReadFile("config.json")
+	cfgErr := json.Unmarshal(file, &config)
+	if cfgErr != nil {
+		println(cfgErr)
+		return
+	}
+
 	mux := http.NewServeMux()
 	repository = NewRepositoryImpl(NewMockPostRepository(true))
 	mux.HandleFunc("/hello", getHello)
