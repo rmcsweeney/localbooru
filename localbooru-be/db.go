@@ -43,9 +43,9 @@ func NewSqlPostRepository(dbPath string) *SqlPostRepository {
 func (r *SqlPostRepository) GetPostById(ctx context.Context, id int) (*Post, error) {
 	post := r.db.QueryRow("SELECT * FROM posts WHERE id = ?", id)
 	var p Post
-	err := post.Scan(&p.ID, &p.FileName, &p.FileType, &p.CreatedAt)
-	if err != nil {
-		return nil, err
+	postErr := post.Scan(&p.ID, &p.FileName, &p.FileType, &p.CreatedAt)
+	if postErr != nil {
+		log.Fatal("Issue unpacking post: " + postErr.Error())
 	}
 	tags, err := r.db.Query("select t.name, t.type, t.count "+
 		"from tags t inner join post_tags pt on t.id = pt.tag_id "+
@@ -57,7 +57,7 @@ func (r *SqlPostRepository) GetPostById(ctx context.Context, id int) (*Post, err
 		var t Tag
 		tagErr := tags.Scan(&t.Name, &t.Type, &t.Count)
 		if tagErr != nil {
-			log.Fatal("Issue getting tags: " + tagErr.Error())
+			log.Fatal("Issue unpacking tags: " + tagErr.Error())
 		}
 		p.Tags = append(p.Tags, &t)
 	}
