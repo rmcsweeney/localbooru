@@ -48,6 +48,16 @@ export default function Post() {
                             Created at: {postData.CreatedAt}
                         </p>
                     </div>
+                    {postData.Tags.map( (tag, index) => {
+                        return <div key={index} className={"flex justify-between items-center"}>
+                            <p className={"text-left"}>
+                                {tag.Name}
+                            </p>
+                            <p className={"text-right"}>
+                                {tag.Count}
+                            </p>
+                        </div>
+                    })}
                 </div>
                 <div className={"m-4 border-4 border-b-cyan-700"}>
                     {postData.FileName === "loading.gif"?

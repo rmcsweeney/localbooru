@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -40,8 +41,7 @@ func main() {
 	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
-		println(err)
-		return
+		log.Fatal("ListenAndServe: " + err.Error())
 	}
 	println("Server started")
 }
@@ -121,7 +121,10 @@ func getMedia(w http.ResponseWriter, r *http.Request) {
 
 func getPostById(w http.ResponseWriter, r *http.Request) {
 	postId, _ := strconv.Atoi(r.PathValue("id"))
-	res, _ := repository.posts.GetPostById(r.Context(), postId)
+	res, repoErr := repository.posts.GetPostById(r.Context(), postId)
+	if repoErr != nil {
+		log.Fatal("Repo error on GetPostById: " + repoErr.Error())
+	}
 	setResponseHeaders(w)
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
