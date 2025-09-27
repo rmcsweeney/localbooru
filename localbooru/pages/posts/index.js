@@ -98,6 +98,11 @@ export default function Post() {
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
                 <input className={"max-w-[100%]"} placeholder={"Enter tags..."} onInput={e => setQuery(e.currentTarget.value)} onKeyDown={onSearchKeyDown}></input>
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={handleSearch}> Search </button>
+                <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
+                    <label for="file">File</label>
+                    <input id="file" name="uploadFile" type="file" />
+                    <button>Upload</button>
+                </form>
             </div>
             <div>
                 <div className={"grid-cols-4 grid"} >

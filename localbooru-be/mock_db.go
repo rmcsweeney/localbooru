@@ -121,3 +121,5 @@ func (m *MockPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Ta
 	// For a richer mock, keep a post->tags mapping; here we return empty.
 	return []*Tag{}, nil
 }
+
+//func MakePostFromFile(fileName)

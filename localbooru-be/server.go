@@ -8,6 +8,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"path/filepath"
+	"io"
 )
 
 var repository *RepositoryImpl
@@ -21,6 +23,7 @@ func main() {
 	mux.HandleFunc("/posts/tag/{tag}", getPostsByTag)
 	mux.HandleFunc("/posts/{id}", getPostById)
 	mux.HandleFunc("/assets/{type}/{file}", getMedia)
+	mux.HandleFunc("/upload", uploadMedia)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		println(err)
@@ -113,6 +116,35 @@ func getPostById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.Close = true
+}
+
+func uploadMedia(w http.ResponseWriter, r *http.Request) {
+	// Limit request body size to 10MB
+    r.Body = http.MaxBytesReader(w, r.Body, 10<<20)
+
+    // Parse the multipart form with maxMemory of 10MB
+   /* err := r.ParseMultipartForm(10 << 20)
+    if err != nil {
+        http.Error(w, "Error parsing multipart form", http.StatusBadRequest)
+        return
+    }*/
+
+    file,handler,err := r.FormFile("uploadFile")
+	if err != nil {
+        fmt.Fprintf(w, "Error retrieving the file: %v", err)
+        return
+    }
+    defer file.Close()
+
+    f, err := os.Create(filepath.Join("uploads",handler.Filename))
+	if err != nil {
+        fmt.Fprintf(w, "Error saving the file: %v", err)
+        return
+    }
+    defer f.Close()
+
+	io.Copy(f,file)
+	fmt.Fprintf(w, "File uploaded successfully: %v", handler.Filename)
 }
 
 func setResponseHeaders(w http.ResponseWriter) {
