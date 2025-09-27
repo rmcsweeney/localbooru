@@ -4,14 +4,36 @@ import (
 	"context"
 	"database/sql"
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type SqlPostRepository struct {
 	db *sql.DB
 }
 
-func NewSqlPostRepository(db *sql.DB) *SqlPostRepository {
-	db, err := sql.Open("sqlite3", "../db/lcbru.db")
+func (r *SqlPostRepository) GetRecentPosts(ctx context.Context, loadSize int, offsetIndex int) ([]*Post, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *SqlPostRepository) GetPostsByTag(ctx context.Context, tag string) ([]*Post, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *SqlPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func NewSqlPostRepository(dbPath string) *SqlPostRepository {
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,8 +55,11 @@ func (r *SqlPostRepository) GetPostById(ctx context.Context, id int) (*Post, err
 	}
 	for tags.Next() {
 		var t Tag
-		_ = tags.Scan(&t.Name, &t.Type, &t.Count)
-		p.Tags = append(p.Tags)
+		tagErr := tags.Scan(&t.Name, &t.Type, &t.Count)
+		if tagErr != nil {
+			log.Fatal("Issue getting tags: " + tagErr.Error())
+		}
+		p.Tags = append(p.Tags, &t)
 	}
 	return &p, nil
 }

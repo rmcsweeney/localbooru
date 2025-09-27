@@ -14,19 +14,24 @@ var repository *RepositoryImpl
 var config Config
 
 type Config struct {
-	UseMockDB bool `json:"UseMockDB"`
+	UseMockDB bool   `json:"UseMockDB"`
+	DbPath    string `json:"DbPath"`
 }
 
 func main() {
 	file, _ := os.ReadFile("config.json")
 	cfgErr := json.Unmarshal(file, &config)
 	if cfgErr != nil {
-		println(cfgErr)
+		println("Issue with config: " + cfgErr.Error())
 		return
 	}
 
 	mux := http.NewServeMux()
-	repository = NewRepositoryImpl(NewMockPostRepository(true))
+	if config.UseMockDB {
+		repository = NewRepositoryImpl(NewMockPostRepository(true))
+	} else {
+		repository = NewRepositoryImpl(NewSqlPostRepository(config.DbPath))
+	}
 	mux.HandleFunc("/hello", getHello)
 	mux.HandleFunc("/posts/{loadSize}/{offset}", getNPosts)
 	mux.HandleFunc("/posts", getRecentPosts)

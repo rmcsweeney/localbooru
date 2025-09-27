@@ -1,3 +1,4 @@
 {
-  "UseMockDB": "true"
+  "UseMockDB": false,
+  "DbPath": "../db/lcbru.db"
 }
