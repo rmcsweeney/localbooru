@@ -8,7 +8,7 @@ db.transaction do
         posts (id, filename, filetype, created_at)
         VALUES (?,?,?,?)")
     for i in 1..25
-        posts.execute(i, "test#{i}", ".png", Time.now.iso8601)
+        posts.execute(i, "test#{i}", "png", Time.now.iso8601)
     end
     posts.close
 end

@@ -12,11 +12,6 @@ type SqlPostRepository struct {
 	db *sql.DB
 }
 
-func (r *SqlPostRepository) GetRecentPosts(ctx context.Context, loadSize int, offsetIndex int) ([]*Post, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	//TODO implement me
 	panic("implement me")
@@ -62,4 +57,22 @@ func (r *SqlPostRepository) GetPostById(ctx context.Context, id int) (*Post, err
 		p.Tags = append(p.Tags, &t)
 	}
 	return &p, nil
+}
+
+func (r *SqlPostRepository) GetRecentPosts(ctx context.Context, loadSize int, offsetIndex int) ([]*Post, error) {
+	posts, err := r.db.Query("SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?", loadSize, offsetIndex)
+	if err != nil {
+		log.Fatal("Issue getting posts: " + err.Error())
+	}
+	defer posts.Close()
+	var postsSlice []*Post
+	for posts.Next() {
+		var p Post
+		postErr := posts.Scan(&p.ID, &p.FileName, &p.FileType, &p.CreatedAt)
+		if postErr != nil {
+			log.Fatal("Issue unpacking post: " + postErr.Error())
+		}
+		postsSlice = append(postsSlice, &p)
+	}
+	return postsSlice, nil
 }
