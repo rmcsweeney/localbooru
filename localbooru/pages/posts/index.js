@@ -2,8 +2,13 @@ import Image from 'next/image';
 import {useEffect, useState, useId} from "react";
 import Link from "next/link";
 import ThemeSwitcher from "../../components/buttons/themeswitcher";
+import Sidebar from "../../components/sidebar/sidebar";
+import {useSearchParams} from "next/navigation";
+import {router} from "next/client";
 
 export default function Post() {
+
+    const searchParams = useSearchParams();
 
     //TODO: figure out how to move the below & similar to a config/env file?
     const baseUrl = 'http://localhost:8080/'
@@ -18,7 +23,7 @@ export default function Post() {
     const [lastQuery, setLastQuery] = useState("");
 
     // Images to load per click
-    const loadSize=6
+    const loadSize=10
     // Number of images loaded so far
     const [loadOffset, setLoadOffset] = useState(0);
 
@@ -30,7 +35,9 @@ export default function Post() {
     
     const fetchPost = async() => {
         try {
-            const res = await fetch(baseUrl + `posts/` + loadSize + '/' + loadOffset);
+            const res = (searchParams.get("tags") === null?
+                await fetch(baseUrl + `posts/` + loadSize + '/' + loadOffset) :
+                await fetch(baseUrl + `posts/tag/` + searchParams.get('tags')))
             const data = await res.json();
             var newPostData = postData.concat(data);
             if (shouldReset) {
@@ -51,37 +58,17 @@ export default function Post() {
     }
 
     const handleSearch = () => {
-        if(query == lastQuery) {
+        if(query === lastQuery) {
             return; // Prevents spamming pointless duplicate searches
         }
         resetState();
-        searchByTag();
         setLastQuery(query);
+        router.push("/posts" + "?" + "tags=" + query);
     }
-
-    const searchByTag = async() => {
-        try {
-            //TODO better validation against SQL/HTML injection etc
-            //TODO support comma delimited list of tags as input (also requires backend changes)
-            const sanitized = query.toLowerCase().trim()
-            if (sanitized.length === 0) {
-                fetchPost();
-                return;
-            }
-            const res = await fetch(baseUrl + `posts/tag/` + sanitized);
-            const data = await res.json();
-            if (data == null || data == undefined) {
-                return;
-            }
-            const newPostData = data
-            setPostData(newPostData) //TODO handle no more images case better
-        } catch (error) {
-            console.log('Error fetching post: ', error);
-        }
-    };
 
     //Calls fetchPost to populate the page at load time once (empty deps array).
     useEffect(() => {
+        setPostData([]);
         fetchPost();
     }, []);
 
