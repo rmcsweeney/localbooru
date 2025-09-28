@@ -17,11 +17,6 @@ func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	panic("implement me")
 }
 
-func (r *SqlPostRepository) GetPostsByTag(ctx context.Context, tag string) ([]*Post, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (r *SqlPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error) {
 	//TODO implement me
 	panic("implement me")
@@ -61,6 +56,24 @@ func (r *SqlPostRepository) GetPostById(ctx context.Context, id int) (*Post, err
 
 func (r *SqlPostRepository) GetRecentPosts(ctx context.Context, loadSize int, offsetIndex int) ([]*Post, error) {
 	posts, err := r.db.Query("SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?", loadSize, offsetIndex)
+	if err != nil {
+		log.Fatal("Issue getting posts: " + err.Error())
+	}
+	defer posts.Close()
+	var postsSlice []*Post
+	for posts.Next() {
+		var p Post
+		postErr := posts.Scan(&p.ID, &p.FileName, &p.FileType, &p.CreatedAt)
+		if postErr != nil {
+			log.Fatal("Issue unpacking post: " + postErr.Error())
+		}
+		postsSlice = append(postsSlice, &p)
+	}
+	return postsSlice, nil
+}
+
+func (r *SqlPostRepository) GetPostsByTag(ctx context.Context, tag string) ([]*Post, error) {
+	posts, err := r.db.Query("select p.id, p.filename, p.filetype, p.created_at from posts p inner join post_tags pt on p.id = pt.post_id inner join tags t on pt.tag_id = t.id WHERE t.name =  ?", tag)
 	if err != nil {
 		log.Fatal("Issue getting posts: " + err.Error())
 	}
