@@ -33,6 +33,7 @@ type Post struct {
 type Tag struct {
 	ID    int
 	Name  string
+	Type  string
 	Count int
 }
 

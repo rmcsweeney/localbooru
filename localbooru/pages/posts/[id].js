@@ -8,9 +8,10 @@ export default function Post() {
 
     const [postData, setPostData] = useState({
         ID: 0,
-        FileName: "loading.webp",
+        FileName: "loading.gif",
         FileType: "images",
         CreatedAt: "",
+        Tags: []
     });
     const baseUrl = 'http://localhost:8080/'
     useEffect(() => {
@@ -47,11 +48,24 @@ export default function Post() {
                             Created at: {postData.CreatedAt}
                         </p>
                     </div>
+                    {postData.Tags.map( (tag, index) => {
+                        return <div key={index} className={"flex justify-between items-center"}>
+                            <p className={"text-left"}>
+                                {tag.Name}
+                            </p>
+                            <p className={"text-right"}>
+                                {tag.Count}
+                            </p>
+                        </div>
+                    })}
                 </div>
                 <div className={"m-4 border-4 border-b-cyan-700"}>
-                    <Image width={500} height={500}
+                    {postData.FileName === "loading.gif"?
+                        <Image width={100} height={100}
+                            alt={"loading"} src={"/images/loading.gif"}></Image>:
+                        <Image width={500} height={500}
                            alt={"post"} src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></Image>
-
+                    }
                 </div>
             </div>
         </>

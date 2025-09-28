@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -13,10 +14,27 @@ import (
 )
 
 var repository *RepositoryImpl
+var config Config
+
+type Config struct {
+	UseMockDB bool   `json:"UseMockDB"`
+	DbPath    string `json:"DbPath"`
+}
 
 func main() {
+	file, _ := os.ReadFile("config.json")
+	cfgErr := json.Unmarshal(file, &config)
+	if cfgErr != nil {
+		println("Issue with config: " + cfgErr.Error())
+		return
+	}
+
 	mux := http.NewServeMux()
-	repository = NewRepositoryImpl(NewMockPostRepository(true))
+	if config.UseMockDB {
+		repository = NewRepositoryImpl(NewMockPostRepository(true))
+	} else {
+		repository = NewRepositoryImpl(NewSqlPostRepository(config.DbPath))
+	}
 	mux.HandleFunc("/hello", getHello)
 	mux.HandleFunc("/posts/{loadSize}/{offset}", getNPosts)
 	mux.HandleFunc("/posts", getRecentPosts)
@@ -26,8 +44,7 @@ func main() {
 	mux.HandleFunc("/upload", uploadMedia)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
-		println(err)
-		return
+		log.Fatal("ListenAndServe: " + err.Error())
 	}
 	println("Server started")
 }
@@ -107,7 +124,10 @@ func getMedia(w http.ResponseWriter, r *http.Request) {
 
 func getPostById(w http.ResponseWriter, r *http.Request) {
 	postId, _ := strconv.Atoi(r.PathValue("id"))
-	res, _ := repository.posts.GetPostById(r.Context(), postId)
+	res, repoErr := repository.posts.GetPostById(r.Context(), postId)
+	if repoErr != nil {
+		log.Fatal("Repo error on GetPostById: " + repoErr.Error())
+	}
 	setResponseHeaders(w)
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
