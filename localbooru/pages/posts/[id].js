@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import {useEffect, useState} from "react";
 import Image from "next/image";
+import Search from "../../components/sidebar/search";
 
 export default function Post() {
     const router = useRouter();
@@ -43,6 +44,7 @@ export default function Post() {
 
             <div className={"grid grid-cols-[20%_80%]"}>
                 <div>
+                    <Search/>
                     <div>
                         <p>
                             Created at: {postData.CreatedAt}
