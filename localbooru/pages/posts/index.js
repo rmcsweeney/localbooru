@@ -1,9 +1,13 @@
 import Image from 'next/image';
-import {useEffect, useState, useId} from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import ThemeSwitcher from "../../components/buttons/themeswitcher";
+import {useSearchParams} from "next/navigation";
+import {router} from "next/client";
 
 export default function Post() {
+
+    const searchParams = useSearchParams();
 
     //TODO: figure out how to move the below & similar to a config/env file?
     const baseUrl = 'http://localhost:8080/'
@@ -16,9 +20,11 @@ export default function Post() {
     const [query, setQuery] = useState("");
     // The last query successfully searched
     const [lastQuery, setLastQuery] = useState("");
+    // The top tags by count TODO: update based on posts loaded or filter by search regex
+    const [topTags, setTopTags] = useState([])
 
     // Images to load per click
-    const loadSize=6
+    const loadSize=10
     // Number of images loaded so far
     const [loadOffset, setLoadOffset] = useState(0);
 
@@ -30,7 +36,9 @@ export default function Post() {
     
     const fetchPost = async() => {
         try {
-            const res = await fetch(baseUrl + `posts/` + loadSize + '/' + loadOffset);
+            const res = (searchParams.get("tags") === null?
+                await fetch(baseUrl + `posts/` + loadSize + '/' + loadOffset) :
+                await fetch(baseUrl + `posts/tag/` + searchParams.get('tags')))
             const data = await res.json();
             var newPostData = postData.concat(data);
             if (shouldReset) {
@@ -44,6 +52,16 @@ export default function Post() {
         }
     };
 
+    const fetchTopTags = async() => {
+        try {
+            const res = await fetch(baseUrl + `tags`);
+            const data = await res.json();
+            setTopTags(data)
+        } catch (error) {
+            console.log('Error fetching top tags: ', error);
+        }
+    }
+
     const onSearchKeyDown = (e) => {
         if(e.key === 'Enter') {
             handleSearch();
@@ -51,38 +69,22 @@ export default function Post() {
     }
 
     const handleSearch = () => {
-        if(query == lastQuery) {
+        if(query === lastQuery) {
             return; // Prevents spamming pointless duplicate searches
         }
         resetState();
-        searchByTag();
         setLastQuery(query);
+        let queryFmt = query.replaceAll(" ", "+");
+        queryFmt.trim()
+        router.push("/posts" + "?" + "tags=" + queryFmt);
     }
 
-    const searchByTag = async() => {
-        try {
-            //TODO better validation against SQL/HTML injection etc
-            //TODO support comma delimited list of tags as input (also requires backend changes)
-            const sanitized = query.toLowerCase().trim()
-            if (sanitized.length === 0) {
-                fetchPost();
-                return;
-            }
-            const res = await fetch(baseUrl + `posts/tag/` + sanitized);
-            const data = await res.json();
-            if (data == null || data == undefined) {
-                return;
-            }
-            const newPostData = data
-            setPostData(newPostData) //TODO handle no more images case better
-        } catch (error) {
-            console.log('Error fetching post: ', error);
-        }
-    };
 
     //Calls fetchPost to populate the page at load time once (empty deps array).
     useEffect(() => {
+        setPostData([]);
         fetchPost();
+        fetchTopTags();
     }, []);
 
 
@@ -96,13 +98,28 @@ export default function Post() {
         <div className={"grid grid-cols-[20%_80%]"}>
             <div className={"m-1"}>
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
-                <input className={"max-w-[100%]"} placeholder={"Enter tags..."} onInput={e => setQuery(e.currentTarget.value)} onKeyDown={onSearchKeyDown}></input>
+                <input className={"max-w-[100%]"} placeholder={"Enter tags..."} list={"dynamicTags"} onInput={e => setQuery(e.currentTarget.value)} onKeyDown={onSearchKeyDown}></input>
+                <datalist id={"dynamicTags"}>
+                    {topTags !== null ? topTags.map( (tag, index) => {
+                        return <option key={index} value={tag.Name}></option>
+                    }): <></>}
+                </datalist>
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={handleSearch}> Search </button>
                 <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
                     <label for="file">File</label>
                     <input id="file" name="uploadFile" type="file" />
                     <button>Upload</button>
                 </form>
+                {topTags !== null ? topTags.map( (tag, index) => {
+                    return <div key={index} className={"flex justify-between items-center"}>
+                        <p className={"text-left"}>
+                            {tag.Name}
+                        </p>
+                        <p className={"text-right"}>
+                            {tag.Count}
+                        </p>
+                    </div>
+                }): <p>Loading tags...</p>}
             </div>
             <div>
                 <div className={"grid-cols-4 grid"} >

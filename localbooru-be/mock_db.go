@@ -25,24 +25,24 @@ func NewMockPostRepository(seed bool) *MockPostRepository {
 		for i := 1; i <= numPosts; i++ {
 			m.posts[i] = &Post{i, "test" + strconv.Itoa(i), "png", "2025-09-12T00:19:10Z", nil}
 			// Tag posts with these IDs as "kronii", the rest will get "none" and "other"
-			if(i == 1 || i ==2 || (i >= 9 && i <=15)) {
+			if i == 1 || i == 2 || (i >= 9 && i <= 15) {
 				m.posts[i].Tags = []*Tag{
 					{
-						ID: 1,
-						Name: "kronii",
+						ID:    1,
+						Name:  "kronii",
 						Count: 1,
 					}}
-				
+
 			} else {
 				m.posts[i].Tags = []*Tag{
 					{
-						ID: 2,
-						Name: "none",
+						ID:    2,
+						Name:  "none",
 						Count: 1,
 					},
 					{
-						ID: 3,
-						Name: "other",
+						ID:    3,
+						Name:  "other",
 						Count: 1,
 					},
 				}
@@ -123,3 +123,9 @@ func (m *MockPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Ta
 }
 
 //func MakePostFromFile(fileName)
+
+func (m *MockPostRepository) GetTopTags(ctx context.Context, loadSize int) ([]*Tag, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return []*Tag{}, nil
+}

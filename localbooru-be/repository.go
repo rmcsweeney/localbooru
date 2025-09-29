@@ -11,6 +11,7 @@ type PostRepository interface {
 	CreatePost(ctx context.Context, post *Post)
 	GetPostsByTag(ctx context.Context, tag string) ([]*Post, error)
 	GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error)
+	GetTopTags(ctx context.Context, loadSize int) ([]*Tag, error)
 }
 
 type RepositoryImpl struct {

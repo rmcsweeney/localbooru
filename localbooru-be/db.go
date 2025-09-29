@@ -89,3 +89,18 @@ func (r *SqlPostRepository) GetPostsByTag(ctx context.Context, tag string) ([]*P
 	}
 	return postsSlice, nil
 }
+
+func (r *SqlPostRepository) GetTopTags(ctx context.Context, limit int) ([]*Tag, error) {
+	tags, err := r.db.Query("select t.name, t.type, t.count from tags t order by count desc limit ?", limit)
+	if err != nil {
+		log.Fatal("Issue getting tags: " + err.Error())
+	}
+	defer tags.Close()
+	var tagsSlice []*Tag
+	for tags.Next() {
+		var t Tag
+		_ = tags.Scan(&t.Name, &t.Type, &t.Count)
+		tagsSlice = append(tagsSlice, &t)
+	}
+	return tagsSlice, nil
+}
