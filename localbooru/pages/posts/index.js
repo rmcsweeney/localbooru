@@ -74,8 +74,11 @@ export default function Post() {
         }
         resetState();
         setLastQuery(query);
-        router.push("/posts" + "?" + "tags=" + query);
+        let queryFmt = query.replaceAll(" ", "+");
+        queryFmt.trim()
+        router.push("/posts" + "?" + "tags=" + queryFmt);
     }
+
 
     //Calls fetchPost to populate the page at load time once (empty deps array).
     useEffect(() => {
@@ -95,7 +98,12 @@ export default function Post() {
         <div className={"grid grid-cols-[20%_80%]"}>
             <div className={"m-1"}>
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
-                <input className={"max-w-[100%]"} placeholder={"Enter tags..."} onInput={e => setQuery(e.currentTarget.value)} onKeyDown={onSearchKeyDown}></input>
+                <input className={"max-w-[100%]"} placeholder={"Enter tags..."} list={"dynamicTags"} onInput={e => setQuery(e.currentTarget.value)} onKeyDown={onSearchKeyDown}></input>
+                <datalist id={"dynamicTags"}>
+                    {topTags !== null ? topTags.map( (tag, index) => {
+                        return <option key={index} value={tag.Name}></option>
+                    }): <></>}
+                </datalist>
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={handleSearch}> Search </button>
                 <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
                     <label for="file">File</label>
