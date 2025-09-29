@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
-	"path/filepath"
-	"io"
 )
 
 var repository *RepositoryImpl
@@ -42,6 +42,7 @@ func main() {
 	mux.HandleFunc("/posts/{id}", getPostById)
 	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	mux.HandleFunc("/upload", uploadMedia)
+	mux.HandleFunc("/tags", getTopTags)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: " + err.Error())
@@ -140,31 +141,44 @@ func getPostById(w http.ResponseWriter, r *http.Request) {
 
 func uploadMedia(w http.ResponseWriter, r *http.Request) {
 	// Limit request body size to 10MB
-    r.Body = http.MaxBytesReader(w, r.Body, 10<<20)
+	r.Body = http.MaxBytesReader(w, r.Body, 10<<20)
 
-    // Parse the multipart form with maxMemory of 10MB
-   /* err := r.ParseMultipartForm(10 << 20)
-    if err != nil {
-        http.Error(w, "Error parsing multipart form", http.StatusBadRequest)
-        return
-    }*/
+	// Parse the multipart form with maxMemory of 10MB
+	/* err := r.ParseMultipartForm(10 << 20)
+	   if err != nil {
+	       http.Error(w, "Error parsing multipart form", http.StatusBadRequest)
+	       return
+	   }*/
 
-    file,handler,err := r.FormFile("uploadFile")
+	file, handler, err := r.FormFile("uploadFile")
 	if err != nil {
-        fmt.Fprintf(w, "Error retrieving the file: %v", err)
-        return
-    }
-    defer file.Close()
+		fmt.Fprintf(w, "Error retrieving the file: %v", err)
+		return
+	}
+	defer file.Close()
 
-    f, err := os.Create(filepath.Join("uploads",handler.Filename))
+	f, err := os.Create(filepath.Join("uploads", handler.Filename))
 	if err != nil {
-        fmt.Fprintf(w, "Error saving the file: %v", err)
-        return
-    }
-    defer f.Close()
+		fmt.Fprintf(w, "Error saving the file: %v", err)
+		return
+	}
+	defer f.Close()
 
-	io.Copy(f,file)
+	io.Copy(f, file)
 	fmt.Fprintf(w, "File uploaded successfully: %v", handler.Filename)
+}
+
+func getTopTags(w http.ResponseWriter, r *http.Request) {
+	res, repoErr := repository.posts.GetTopTags(r.Context(), 10)
+	if repoErr != nil {
+		log.Fatal("Repo error on GetTopTags: " + repoErr.Error())
+	}
+	setResponseHeaders(w)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		println(err)
+		return
+	}
 }
 
 func setResponseHeaders(w http.ResponseWriter) {

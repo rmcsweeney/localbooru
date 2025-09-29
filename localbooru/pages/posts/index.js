@@ -1,8 +1,7 @@
 import Image from 'next/image';
-import {useEffect, useState, useId} from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import ThemeSwitcher from "../../components/buttons/themeswitcher";
-import Sidebar from "../../components/sidebar/sidebar";
 import {useSearchParams} from "next/navigation";
 import {router} from "next/client";
 
@@ -21,6 +20,8 @@ export default function Post() {
     const [query, setQuery] = useState("");
     // The last query successfully searched
     const [lastQuery, setLastQuery] = useState("");
+    // The top tags by count TODO: update based on posts loaded or filter by search regex
+    const [topTags, setTopTags] = useState([])
 
     // Images to load per click
     const loadSize=10
@@ -51,6 +52,16 @@ export default function Post() {
         }
     };
 
+    const fetchTopTags = async() => {
+        try {
+            const res = await fetch(baseUrl + `tags`);
+            const data = await res.json();
+            setTopTags(data)
+        } catch (error) {
+            console.log('Error fetching top tags: ', error);
+        }
+    }
+
     const onSearchKeyDown = (e) => {
         if(e.key === 'Enter') {
             handleSearch();
@@ -70,6 +81,7 @@ export default function Post() {
     useEffect(() => {
         setPostData([]);
         fetchPost();
+        fetchTopTags();
     }, []);
 
 
@@ -90,6 +102,16 @@ export default function Post() {
                     <input id="file" name="uploadFile" type="file" />
                     <button>Upload</button>
                 </form>
+                {topTags !== null ? topTags.map( (tag, index) => {
+                    return <div key={index} className={"flex justify-between items-center"}>
+                        <p className={"text-left"}>
+                            {tag.Name}
+                        </p>
+                        <p className={"text-right"}>
+                            {tag.Count}
+                        </p>
+                    </div>
+                }): <p>Loading tags...</p>}
             </div>
             <div>
                 <div className={"grid-cols-4 grid"} >
