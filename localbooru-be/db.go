@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -13,8 +14,25 @@ type SqlPostRepository struct {
 }
 
 func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
-	//TODO implement me
-	panic("implement me")
+	tx, err := r.db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+	q, err := tx.Prepare("INSERT INTO posts (filename, filetype, created_at) VALUES (?, ?, ?)")
+	if err != nil {
+		println("Error in post creation: " + err.Error())
+	}
+	_, err = q.Exec(post.FileName, post.FileType, time.Now().UTC().Format(time.RFC3339))
+
+	err = tx.Commit()
+	defer q.Close()
+}
+
+func (r *SqlPostRepository) CreateTag(ctx context.Context, tag *Tag) {
+	_, err := r.db.Query("INSERT INTO tags (name, type, count) VALUES (?, ?, ?)", tag.Name, tag.Type, tag.Count)
+	if err != nil {
+		println("Error in tag creation: " + err.Error())
+	}
 }
 
 func (r *SqlPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error) {

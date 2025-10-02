@@ -10,7 +10,7 @@ export default function Home() {
 
   return (
           <div className={"flex-auto flex flex-col min-h-dvh"}>
-              <main className={"flex-grow flex-col min-h-0.5dvh"}>
+              <main className={"flex-grow flex-col min-h-0.3dvh"}>
                   <Dashboard/>
               </main>
               <input></input>

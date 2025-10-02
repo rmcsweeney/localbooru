@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import {useEffect, useState} from "react";
 import Image from "next/image";
+import Search from "../../components/sidebar/search";
 
 export default function Post() {
     const router = useRouter();
@@ -43,12 +44,13 @@ export default function Post() {
 
             <div className={"grid grid-cols-[20%_80%]"}>
                 <div>
+                    <Search/>
                     <div>
                         <p>
                             Created at: {postData.CreatedAt}
                         </p>
                     </div>
-                    {postData.Tags.map( (tag, index) => {
+                    {postData.Tags !== null? postData.Tags.map( (tag, index) => {
                         return <div key={index} className={"flex justify-between items-center"}>
                             <p className={"text-left"}>
                                 {tag.Name}
@@ -57,7 +59,7 @@ export default function Post() {
                                 {tag.Count}
                             </p>
                         </div>
-                    })}
+                    }): <p>No tags yet!</p>}
                 </div>
                 <div className={"m-4 border-4 border-b-cyan-700"}>
                     {postData.FileName === "loading.gif"?

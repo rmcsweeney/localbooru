@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import Link from "next/link";
 import ThemeSwitcher from "../../components/buttons/themeswitcher";
 import {useSearchParams} from "next/navigation";
-import {router} from "next/client";
+import Search from "../../components/sidebar/search";
 
 export default function Post() {
 
@@ -16,10 +16,6 @@ export default function Post() {
     const [postData, setPostData] = useState([]);
     // Workaround flag to reset the page data after searching for an empty string
     const [shouldReset,setShouldReset] = useState(false);
-    // The inputted search query
-    const [query, setQuery] = useState("");
-    // The last query successfully searched
-    const [lastQuery, setLastQuery] = useState("");
     // The top tags by count TODO: update based on posts loaded or filter by search regex
     const [topTags, setTopTags] = useState([])
 
@@ -27,11 +23,6 @@ export default function Post() {
     const loadSize=10
     // Number of images loaded so far
     const [loadOffset, setLoadOffset] = useState(0);
-
-    const resetState = () => {
-        setShouldReset(true); // Not sure why, but setPostData([]) doesn't actually clear the array for some reason - using this flag as a workaround
-        setLoadOffset(0);
-    }
 
     
     const fetchPost = async() => {
@@ -62,24 +53,6 @@ export default function Post() {
         }
     }
 
-    const onSearchKeyDown = (e) => {
-        if(e.key === 'Enter') {
-            handleSearch();
-        }
-    }
-
-    const handleSearch = () => {
-        if(query === lastQuery) {
-            return; // Prevents spamming pointless duplicate searches
-        }
-        resetState();
-        setLastQuery(query);
-        let queryFmt = query.replaceAll(" ", "+");
-        queryFmt.trim()
-        router.push("/posts" + "?" + "tags=" + queryFmt);
-    }
-
-
     //Calls fetchPost to populate the page at load time once (empty deps array).
     useEffect(() => {
         setPostData([]);
@@ -98,13 +71,7 @@ export default function Post() {
         <div className={"grid grid-cols-[20%_80%]"}>
             <div className={"m-1"}>
                 <button className={"border-4 border-b-cyan-700 mb-1"} onClick={fetchPost}> Click to load {loadSize} image{loadSize === 1 ? "" : "s"}</button>
-                <input className={"max-w-[100%]"} placeholder={"Enter tags..."} list={"dynamicTags"} onInput={e => setQuery(e.currentTarget.value)} onKeyDown={onSearchKeyDown}></input>
-                <datalist id={"dynamicTags"}>
-                    {topTags !== null ? topTags.map( (tag, index) => {
-                        return <option key={index} value={tag.Name}></option>
-                    }): <></>}
-                </datalist>
-                <button className={"border-4 border-b-cyan-700 mb-1"} onClick={handleSearch}> Search </button>
+                <Search/>
                 <form action="http://localhost:8080/upload" method="post" enctype="multipart/form-data">
                     <label for="file">File</label>
                     <input id="file" name="uploadFile" type="file" />
