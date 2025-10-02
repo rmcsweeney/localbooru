@@ -50,7 +50,7 @@ export default function Post() {
                             Created at: {postData.CreatedAt}
                         </p>
                     </div>
-                    {postData.Tags.map( (tag, index) => {
+                    {postData.Tags !== null? postData.Tags.map( (tag, index) => {
                         return <div key={index} className={"flex justify-between items-center"}>
                             <p className={"text-left"}>
                                 {tag.Name}
@@ -59,7 +59,7 @@ export default function Post() {
                                 {tag.Count}
                             </p>
                         </div>
-                    })}
+                    }): <p>No tags yet!</p>}
                 </div>
                 <div className={"m-4 border-4 border-b-cyan-700"}>
                     {postData.FileName === "loading.gif"?

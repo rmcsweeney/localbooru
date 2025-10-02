@@ -143,21 +143,14 @@ func uploadMedia(w http.ResponseWriter, r *http.Request) {
 	// Limit request body size to 10MB
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20)
 
-	// Parse the multipart form with maxMemory of 10MB
-	/* err := r.ParseMultipartForm(10 << 20)
-	   if err != nil {
-	       http.Error(w, "Error parsing multipart form", http.StatusBadRequest)
-	       return
-	   }*/
-
-	file, handler, err := r.FormFile("uploadFile")
+	file, handler, err := r.FormFile("file")
 	if err != nil {
 		fmt.Fprintf(w, "Error retrieving the file: %v", err)
 		return
 	}
 	defer file.Close()
 
-	f, err := os.Create(filepath.Join("uploads", handler.Filename))
+	f, err := os.Create(filepath.Join("assets/images/", handler.Filename))
 	if err != nil {
 		fmt.Fprintf(w, "Error saving the file: %v", err)
 		return
@@ -166,6 +159,11 @@ func uploadMedia(w http.ResponseWriter, r *http.Request) {
 
 	io.Copy(f, file)
 	fmt.Fprintf(w, "File uploaded successfully: %v", handler.Filename)
+	fileName := handler.Filename
+	split := strings.Split(fileName, ".")
+	name, extension := split[0], split[1]
+	repository.posts.CreatePost(r.Context(), &Post{FileName: name, FileType: extension})
+	setResponseHeaders(w)
 }
 
 func getTopTags(w http.ResponseWriter, r *http.Request) {
