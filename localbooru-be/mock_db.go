@@ -129,3 +129,9 @@ func (m *MockPostRepository) GetTopTags(ctx context.Context, loadSize int) ([]*T
 	defer m.mu.RUnlock()
 	return []*Tag{}, nil
 }
+
+func (m *MockPostRepository) CreateTag(ctx context.Context, tag *Tag) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.tags[tag.Name] = tag
+}

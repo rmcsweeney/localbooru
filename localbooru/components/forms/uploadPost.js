@@ -1,12 +1,5 @@
-import Form from "next/form";
-import {useState} from "react";
-
-export default function Upload() {
+export default function UploadPost() {
     const baseUrl = "http://localhost:8080/";
-
-    /*const changeFile = (event) => {
-        setFile(event.target.files[0]);
-    }*/
 
     const uploadFile = async(formData) => {
 

@@ -42,6 +42,7 @@ func main() {
 	mux.HandleFunc("/posts/{id}", getPostById)
 	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	mux.HandleFunc("/upload", uploadMedia)
+	mux.HandleFunc("/upload/tag", uploadTag)
 	mux.HandleFunc("/tags", getTopTags)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
@@ -163,6 +164,14 @@ func uploadMedia(w http.ResponseWriter, r *http.Request) {
 	split := strings.Split(fileName, ".")
 	name, extension := split[0], split[1]
 	repository.posts.CreatePost(r.Context(), &Post{FileName: name, FileType: extension})
+	setResponseHeaders(w)
+}
+
+func uploadTag(w http.ResponseWriter, r *http.Request) {
+	tagName := r.FormValue("tag")
+	tagType := r.FormValue("type")
+
+	repository.posts.CreateTag(r.Context(), &Tag{Name: tagName, Type: tagType})
 	setResponseHeaders(w)
 }
 
