@@ -1,5 +1,5 @@
 export default function UploadTag() {
-    const baseUrl = "http://localhost:8080/";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
     const uploadTag = async(formData) => {
 

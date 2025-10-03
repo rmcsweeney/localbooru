@@ -5,7 +5,7 @@ import {useSearchParams} from "next/navigation";
 export default function Search() {
     const searchParams = useSearchParams();
     // The inputted search query
-    const baseUrl = 'http://localhost:8080/'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
     const [topTags, setTopTags] = useState([])
     const [query, setQuery] = useState("");
 

@@ -9,8 +9,7 @@ export default function Post() {
 
     const searchParams = useSearchParams();
 
-    //TODO: figure out how to move the below & similar to a config/env file?
-    const baseUrl = 'http://localhost:8080/'
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
     // The posts currently loaded for display
     const [postData, setPostData] = useState([]);
