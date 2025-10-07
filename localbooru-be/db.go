@@ -13,6 +13,21 @@ type SqlPostRepository struct {
 	db *sql.DB
 }
 
+func (r *SqlPostRepository) AddTagToPost(ctx context.Context, postId int, tagName string) {
+	tx, _ := r.db.Begin()
+	tagData, _ := r.db.Query("SELECT * FROM tags WHERE name = ?", tagName)
+	defer tagData.Close()
+	var t Tag
+	err := tagData.Scan(&t.ID, &t.Name, &t.Type, &t.Count)
+	if err != nil {
+		log.Fatal("Error getting tag: " + err.Error())
+		return
+	}
+	q, _ := tx.Prepare("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)")
+	q.Exec(postId, t.ID)
+	tx.Commit()
+}
+
 func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -25,14 +40,24 @@ func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	_, err = q.Exec(post.FileName, post.FileType, time.Now().UTC().Format(time.RFC3339))
 
 	err = tx.Commit()
+
 	defer q.Close()
 }
 
 func (r *SqlPostRepository) CreateTag(ctx context.Context, tag *Tag) {
-	_, err := r.db.Query("INSERT INTO tags (name, type, count) VALUES (?, ?, ?)", tag.Name, tag.Type, tag.Count)
+	tx, err := r.db.Begin()
 	if err != nil {
-		println("Error in tag creation: " + err.Error())
+		log.Fatal(err)
 	}
+	q, err := tx.Prepare("INSERT INTO tags (name, type, count) VALUES (?, ?, ?)")
+	if err != nil {
+		println("Error in post creation: " + err.Error())
+	}
+	_, err = q.Exec(tag.Name, tag.Type, 0)
+
+	err = tx.Commit()
+
+	defer q.Close()
 }
 
 func (r *SqlPostRepository) GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error) {

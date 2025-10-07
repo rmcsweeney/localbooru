@@ -14,6 +14,11 @@ type MockPostRepository struct {
 	tags  map[string]*Tag
 }
 
+func (m *MockPostRepository) AddTagToPost(ctx context.Context, postId int, tagId string) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewMockPostRepository(seed bool) *MockPostRepository {
 	m := &MockPostRepository{
 		posts: make(map[int]*Post),
@@ -128,4 +133,10 @@ func (m *MockPostRepository) GetTopTags(ctx context.Context, loadSize int) ([]*T
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return []*Tag{}, nil
+}
+
+func (m *MockPostRepository) CreateTag(ctx context.Context, tag *Tag) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.tags[tag.Name] = tag
 }

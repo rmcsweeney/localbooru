@@ -9,9 +9,11 @@ type PostRepository interface {
 	GetPostById(ctx context.Context, id int) (*Post, error)
 	GetRecentPosts(ctx context.Context, loadSize int, offsetIndex int) ([]*Post, error)
 	CreatePost(ctx context.Context, post *Post)
+	CreateTag(ctx context.Context, tag *Tag)
 	GetPostsByTag(ctx context.Context, tag string) ([]*Post, error)
 	GetTagsByPostId(ctx context.Context, id int) ([]*Tag, error)
 	GetTopTags(ctx context.Context, loadSize int) ([]*Tag, error)
+	AddTagToPost(ctx context.Context, postId int, tagName string)
 }
 
 type RepositoryImpl struct {

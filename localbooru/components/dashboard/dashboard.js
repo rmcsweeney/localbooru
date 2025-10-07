@@ -1,9 +1,8 @@
 import Image from "next/image";
-import {useEffect, useState} from "react";
-import {router} from "next/client";
 import Link from "next/link";
 import Search from "../sidebar/search";
-import Upload from "../forms/upload";
+import UploadPost from "../forms/uploadPost";
+import UploadTag from "../forms/uploadTag";
 
 export default function Dashboard() {
 
@@ -21,7 +20,8 @@ export default function Dashboard() {
                 <Link href={"/posts"} className={"border-4 border-b-cyan-700"}>
                     <p className={"text-center"}>Go to all Posts</p>
                 </Link>
-                <Upload></Upload>
+                <UploadPost></UploadPost>
+                <UploadTag></UploadTag>
             </div>
         </div>
 
