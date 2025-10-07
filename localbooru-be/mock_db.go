@@ -14,6 +14,11 @@ type MockPostRepository struct {
 	tags  map[string]*Tag
 }
 
+func (m *MockPostRepository) AddTagToPost(ctx context.Context, postId int, tagId string) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewMockPostRepository(seed bool) *MockPostRepository {
 	m := &MockPostRepository{
 		posts: make(map[int]*Post),

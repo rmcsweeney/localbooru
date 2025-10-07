@@ -13,6 +13,21 @@ type SqlPostRepository struct {
 	db *sql.DB
 }
 
+func (r *SqlPostRepository) AddTagToPost(ctx context.Context, postId int, tagName string) {
+	tx, _ := r.db.Begin()
+	tagData, _ := r.db.Query("SELECT * FROM tags WHERE name = ?", tagName)
+	defer tagData.Close()
+	var t Tag
+	err := tagData.Scan(&t.ID, &t.Name, &t.Type, &t.Count)
+	if err != nil {
+		log.Fatal("Error getting tag: " + err.Error())
+		return
+	}
+	q, _ := tx.Prepare("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)")
+	q.Exec(postId, t.ID)
+	tx.Commit()
+}
+
 func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	tx, err := r.db.Begin()
 	if err != nil {

@@ -44,6 +44,7 @@ func main() {
 	mux.HandleFunc("/upload", uploadMedia)
 	mux.HandleFunc("/upload/tag", uploadTag)
 	mux.HandleFunc("/tags", getTopTags)
+	mux.HandleFunc("/add/tag", addTagToPost)
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: " + err.Error())
@@ -186,6 +187,13 @@ func getTopTags(w http.ResponseWriter, r *http.Request) {
 		println(err)
 		return
 	}
+}
+
+func addTagToPost(w http.ResponseWriter, r *http.Request) {
+	postId, _ := strconv.Atoi(r.FormValue("postId"))
+	tagName := r.FormValue("tagName")
+	repository.posts.AddTagToPost(r.Context(), postId, tagName)
+	setResponseHeaders(w)
 }
 
 func setResponseHeaders(w http.ResponseWriter) {
