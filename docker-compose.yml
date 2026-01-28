@@ -1,0 +1,19 @@
+services:
+  localbooru-be:
+    build: ./localbooru-be
+    volumes:
+      - ./db:/data
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  localbooru:
+    build: ./localbooru
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    env_file:
+      - path: localbooru/.env.development
+        required: false
+      - path: localbooru/.env.local
+        required: false

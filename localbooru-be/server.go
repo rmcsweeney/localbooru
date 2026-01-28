@@ -22,7 +22,10 @@ type Config struct {
 }
 
 func main() {
-	file, _ := os.ReadFile("config.json")
+	file, fileErr := os.ReadFile("config.json")
+	if fileErr != nil {
+		log.Fatal("Error reading config.json file")
+	}
 	cfgErr := json.Unmarshal(file, &config)
 	if cfgErr != nil {
 		println("Issue with config: " + cfgErr.Error())
