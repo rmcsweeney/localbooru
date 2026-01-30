@@ -2,7 +2,8 @@ services:
   localbooru-be:
     build: ./localbooru-be
     volumes:
-      - ./db:/data
+      - ./db:/db
+      - ./localbooru-be/assets:/root/assets
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -15,5 +16,7 @@ services:
     env_file:
       - path: localbooru/.env.development
         required: false
-      - path: localbooru/.env.local
-        required: false
+#      - path: localbooru/.env.local
+#        required: false
+#first arg for ports is different from the default ports of nextjs/go be so they can be run in tandem
+#w npm run dev, go run .
