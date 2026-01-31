@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import {useEffect, useState} from "react";
 import Image from "next/image";
 import Search from "../../components/sidebar/search";
+import {SearchType} from "../../constants/enums";
 
 export default function Post() {
     const router = useRouter();
@@ -60,15 +61,23 @@ export default function Post() {
                             </p>
                         </div>
                     }): <p>No tags yet!</p>}
+
                 </div>
-                <div className={"m-4 border-4 border-b-cyan-700"}>
-                    {postData.FileName === "loading.gif"?
-                        <Image width={100} height={100}
-                            alt={"loading"} src={"/images/loading.gif"}></Image>:
-                        <Image width={500} height={500}
-                           alt={"post"} src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></Image>
-                    }
+                <div>
+                    <div className={"m-4 border-4 border-b-cyan-700"}>
+                        {postData.FileName === "loading.gif"?
+                            <Image width={100} height={100}
+                                   alt={"loading"} src={"/images/loading.gif"}></Image>:
+                            <Image width={500} height={500}
+                                   alt={"post"} src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></Image>
+                        }
+                    </div>
+                    <div className={""}>
+                        <p>Add a tag?</p>
+                        <Search search={SearchType.ADD} />
+                    </div>
                 </div>
+
             </div>
         </>
     )

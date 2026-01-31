@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
 import {router} from "next/client";
 import {useSearchParams} from "next/navigation";
+import {SearchType} from "../../constants/enums";
 
-export default function Search() {
+export default function Search({search = SearchType.SEARCH}) {
     const searchParams = useSearchParams();
     // The inputted search query
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -30,9 +31,14 @@ export default function Search() {
     }
 
     const handleSearch = () => {
-        let queryFmt = query.replaceAll(" ", "+");
-        queryFmt = queryFmt.trim()
-        router.push("/posts?tags=" + queryFmt);
+        if (search === SearchType.SEARCH){
+            let queryFmt = query.replaceAll(" ", "+");
+            queryFmt = queryFmt.trim()
+            router.push("/posts?tags=" + queryFmt);
+        }
+        else if (search === SearchType.ADD){
+
+        }
     }
 
     return <>
@@ -45,7 +51,7 @@ export default function Search() {
                     return <option key={index} value={tag.Name}></option>
                 }) : <></>}
             </datalist>
-            <button className={"border-4 border-b-cyan-700 mb-1"} onClick={handleSearch}> Search</button>
+            <button className={"border-4 border-b-cyan-700 mb-1"} onClick={handleSearch}>{search}</button>
         </div>
     </>
 }
