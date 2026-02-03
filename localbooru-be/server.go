@@ -193,7 +193,10 @@ func getTopTags(w http.ResponseWriter, r *http.Request) {
 }
 
 func addTagToPost(w http.ResponseWriter, r *http.Request) {
-	postId, _ := strconv.Atoi(r.FormValue("postId"))
+	postId, convErr := strconv.Atoi(r.FormValue("postId"))
+	if convErr != nil {
+		http.Error(w, "Invalid postId", http.StatusBadRequest)
+	}
 	tagName := r.FormValue("tagName")
 	repository.posts.AddTagToPost(r.Context(), postId, tagName)
 	setResponseHeaders(w)

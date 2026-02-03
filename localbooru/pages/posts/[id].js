@@ -15,6 +15,7 @@ export default function Post() {
         CreatedAt: "",
         Tags: []
     });
+
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
     useEffect(() => {
         const fetchPost = async() => {
@@ -74,7 +75,7 @@ export default function Post() {
                     </div>
                     <div className={""}>
                         <p>Add a tag?</p>
-                        <Search search={SearchType.ADD} />
+                        <Search search={SearchType.ADD} postId={id} />
                     </div>
                 </div>
 
