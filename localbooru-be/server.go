@@ -48,6 +48,8 @@ func main() {
 	mux.HandleFunc("/upload/tag", uploadTag)
 	mux.HandleFunc("/tags", getTopTags)
 	mux.HandleFunc("/add/tag", addTagToPost)
+	mux.Handle("/assets/images/", http.StripPrefix("/assets/images/",
+		CORS(http.FileServer(http.Dir("./assets/images")))))
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: " + err.Error())
@@ -124,7 +126,7 @@ func getMedia(w http.ResponseWriter, r *http.Request) {
 	w.Write(buffer.Bytes())
 	w.Header().Set("Content-Disposition", "inline; filename="+fileName+"")
 	w.Header().Set("Content-Length", strconv.Itoa(len(buffer.Bytes())))
-
+	w.WriteHeader(http.StatusOK)
 	r.Close = true
 }
 
@@ -206,5 +208,14 @@ func setResponseHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Disposition")
+}
+
+func CORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Disposition")
+		next.ServeHTTP(w, r)
+	})
 }
