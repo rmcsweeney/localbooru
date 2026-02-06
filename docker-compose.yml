@@ -9,14 +9,17 @@ services:
     restart: unless-stopped
 
   localbooru:
-    build: ./localbooru
+    build:
+        context: ./localbooru
+        args:
+          -NEXT_PUBLIC_API_URL: $(NEXT_PUBLIC_API_URL)
     ports:
       - "3000:3000"
     restart: unless-stopped
     env_file:
+      - path: localbooru/.env.production
+        required: false
       - path: localbooru/.env.development
         required: false
-#      - path: localbooru/.env.local
-#        required: false
-#first arg for ports is different from the default ports of nextjs/go be so they can be run in tandem
-#w npm run dev, go run .
+      - path: localbooru/.env.local
+        required: false

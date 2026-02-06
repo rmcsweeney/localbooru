@@ -43,7 +43,6 @@ func main() {
 	mux.HandleFunc("/posts", getRecentPosts)
 	mux.HandleFunc("/posts/tag/{tag}", getPostsByTag)
 	mux.HandleFunc("/posts/{id}", getPostById)
-	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	mux.HandleFunc("/upload", uploadMedia)
 	mux.HandleFunc("/upload/tag", uploadTag)
 	mux.HandleFunc("/tags", getTopTags)
