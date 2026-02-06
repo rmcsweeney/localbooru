@@ -9,7 +9,7 @@ export default function Post() {
 
     const searchParams = useSearchParams();
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL
 
     // The posts currently loaded for display
     const [postData, setPostData] = useState([]);

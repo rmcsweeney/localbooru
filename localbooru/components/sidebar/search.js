@@ -6,7 +6,7 @@ import {SearchType} from "../../constants/enums";
 export default function Search({search = SearchType.SEARCH, postId=null}) {
     const searchParams = useSearchParams();
     // The inputted search query
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL
     const [topTags, setTopTags] = useState([])
     const [query, setQuery] = useState("");
 

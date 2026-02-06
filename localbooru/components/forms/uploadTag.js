@@ -1,5 +1,5 @@
 export default function UploadTag() {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const uploadTag = async(formData) => {
 

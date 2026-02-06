@@ -16,7 +16,7 @@ export default function Post() {
         Tags: []
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL
     useEffect(() => {
         const fetchPost = async() => {
             try {
