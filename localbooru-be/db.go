@@ -30,6 +30,17 @@ func (r *SqlPostRepository) AddTagToPost(ctx context.Context, postId int, tagNam
 	if txErr != nil {
 		log.Println("Error executing transaction" + err.Error())
 	}
+
+	//Now, increment the Tag's count
+	inc, prepIncError := tx.Prepare("UPDATE tags SET count = ? WHERE name = ?")
+	if prepIncError != nil {
+		log.Println("Error preparing to increment count: " + prepIncError.Error())
+	}
+	_, incError := inc.Exec(t.Count+1, t.Name)
+	if incError != nil {
+		log.Println("Error incrementing count: " + incError.Error())
+	}
+
 	tx.Commit()
 }
 

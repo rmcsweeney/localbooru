@@ -70,7 +70,7 @@ export default function Post() {
                             <Image width={100} height={100}
                                    alt={"loading"} src={"/images/loading.gif"}></Image>:
                             <Image width={500} height={500}
-                                   alt={"post"} src={baseUrl + "assets/images" + "/" + postData.FileName + ".png"}></Image>
+                                   alt={"post"} src={baseUrl + "assets/images" + "/" + postData.FileName + "." + postData.FileType}></Image>
                         }
                     </div>
                     <div className={""}>
