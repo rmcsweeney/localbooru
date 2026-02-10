@@ -3,7 +3,6 @@ import {useEffect, useState} from "react";
 import Image from "next/image";
 import Search from "../../components/sidebar/search";
 import {SearchType} from "../../constants/enums";
-import Dashboard from "../../components/dashboard/dashboard";
 import Link from "next/link";
 
 export default function Post() {
