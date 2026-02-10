@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
     output: 'standalone',
+    env: {
+        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+    },
     images: {
         unoptimized: true,
       remotePatterns: [new URL('http://localhost:8080/assets/images/**'),
@@ -13,7 +16,11 @@ const nextConfig: NextConfig = {
               port: '8080',
               pathname: '/assets/images/**',
 
-          }] // Not sure why this is needed, but it won't work without it
+          },
+          new URL(process.env.NEXT_PUBLIC_API_URL + "*" || 'https://localhost:8081'),
+          ]
+        // Not sure why this is needed, but it won't work without it
+
     }
 };
 

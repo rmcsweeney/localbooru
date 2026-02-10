@@ -31,6 +31,7 @@ func main() {
 		println("Issue with config: " + cfgErr.Error())
 		return
 	}
+	log.Println("Config OK. Starting server...")
 
 	mux := http.NewServeMux()
 	if config.UseMockDB {
@@ -43,11 +44,12 @@ func main() {
 	mux.HandleFunc("/posts", getRecentPosts)
 	mux.HandleFunc("/posts/tag/{tag}", getPostsByTag)
 	mux.HandleFunc("/posts/{id}", getPostById)
-	mux.HandleFunc("/assets/{type}/{file}", getMedia)
 	mux.HandleFunc("/upload", uploadMedia)
 	mux.HandleFunc("/upload/tag", uploadTag)
 	mux.HandleFunc("/tags", getTopTags)
 	mux.HandleFunc("/add/tag", addTagToPost)
+	mux.Handle("/assets/images/", http.StripPrefix("/assets/images/",
+		CORS(http.FileServer(http.Dir("./assets/images")))))
 	err := http.ListenAndServe(":8080", mux)
 	if err != nil {
 		log.Fatal("ListenAndServe: " + err.Error())
@@ -62,7 +64,7 @@ func getRecentPosts(w http.ResponseWriter, r *http.Request) {
 	res, _ := repository.posts.GetRecentPosts(r.Context(), loadSize, offset)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -74,7 +76,7 @@ func getPostsByTag(w http.ResponseWriter, r *http.Request) {
 	res, _ := repository.posts.GetPostsByTag(r.Context(), tag)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -99,7 +101,7 @@ func getNPosts(w http.ResponseWriter, r *http.Request) {
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -124,7 +126,7 @@ func getMedia(w http.ResponseWriter, r *http.Request) {
 	w.Write(buffer.Bytes())
 	w.Header().Set("Content-Disposition", "inline; filename="+fileName+"")
 	w.Header().Set("Content-Length", strconv.Itoa(len(buffer.Bytes())))
-
+	w.WriteHeader(http.StatusOK)
 	r.Close = true
 }
 
@@ -138,7 +140,7 @@ func getPostById(w http.ResponseWriter, r *http.Request) {
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -187,13 +189,16 @@ func getTopTags(w http.ResponseWriter, r *http.Request) {
 	setResponseHeaders(w)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 }
 
 func addTagToPost(w http.ResponseWriter, r *http.Request) {
-	postId, _ := strconv.Atoi(r.FormValue("postId"))
+	postId, convErr := strconv.Atoi(r.FormValue("postId"))
+	if convErr != nil {
+		http.Error(w, "Invalid postId", http.StatusBadRequest)
+	}
 	tagName := r.FormValue("tagName")
 	repository.posts.AddTagToPost(r.Context(), postId, tagName)
 	setResponseHeaders(w)
@@ -203,5 +208,14 @@ func setResponseHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Disposition")
+}
+
+func CORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Disposition")
+		next.ServeHTTP(w, r)
+	})
 }

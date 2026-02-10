@@ -3,10 +3,10 @@ import {router} from "next/client";
 import {useSearchParams} from "next/navigation";
 import {SearchType} from "../../constants/enums";
 
-export default function Search({search = SearchType.SEARCH}) {
+export default function Search({search = SearchType.SEARCH, postId=null}) {
     const searchParams = useSearchParams();
     // The inputted search query
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL
     const [topTags, setTopTags] = useState([])
     const [query, setQuery] = useState("");
 
@@ -24,6 +24,24 @@ export default function Search({search = SearchType.SEARCH}) {
         }
     }
 
+    const addTag = async(tagName) => {
+        try {
+            let formData = new FormData();
+            formData.append("tagName", tagName);
+            formData.append("postId", postId);
+            const res = await fetch(baseUrl + `add/tag`, {
+                method: 'POST',
+                body: formData,
+            })
+            if (res.ok) {
+                console.log("Successfully added the tag " + tagName);
+            }
+        }
+        catch (error) {
+            console.log("Error adding tag: ", error);
+        }
+    }
+
     const onSearchKeyDown = (e) => {
         if(e.key === 'Enter') {
             handleSearch();
@@ -37,7 +55,9 @@ export default function Search({search = SearchType.SEARCH}) {
             router.push("/posts?tags=" + queryFmt);
         }
         else if (search === SearchType.ADD){
-
+            let queryFmt = query.replaceAll(" ", "+");
+            queryFmt = queryFmt.trim()
+            addTag(queryFmt);
         }
     }
 

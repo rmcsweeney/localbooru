@@ -15,29 +15,48 @@ type SqlPostRepository struct {
 
 func (r *SqlPostRepository) AddTagToPost(ctx context.Context, postId int, tagName string) {
 	tx, _ := r.db.Begin()
-	tagData, _ := r.db.Query("SELECT * FROM tags WHERE name = ?", tagName)
-	defer tagData.Close()
+	tagData := r.db.QueryRow("SELECT * FROM tags WHERE name = ?", tagName)
 	var t Tag
 	err := tagData.Scan(&t.ID, &t.Name, &t.Type, &t.Count)
 	if err != nil {
-		log.Fatal("Error getting tag: " + err.Error())
+		log.Println("Error getting tag: " + err.Error())
 		return
+	} //TODO need to check if post tag link already exists
+	q, prepTErr := tx.Prepare("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)")
+	if prepTErr != nil {
+		log.Println("Error preparing transaction" + err.Error())
 	}
-	q, _ := tx.Prepare("INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?)")
-	q.Exec(postId, t.ID)
+	_, txErr := q.Exec(postId, t.ID)
+	if txErr != nil {
+		log.Println("Error executing transaction" + err.Error())
+	}
+
+	//Now, increment the Tag's count
+	inc, prepIncError := tx.Prepare("UPDATE tags SET count = ? WHERE name = ?")
+	if prepIncError != nil {
+		log.Println("Error preparing to increment count: " + prepIncError.Error())
+	}
+	_, incError := inc.Exec(t.Count+1, t.Name)
+	if incError != nil {
+		log.Println("Error incrementing count: " + incError.Error())
+	}
+
 	tx.Commit()
 }
 
 func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error creating post: " + err.Error())
 	}
 	q, err := tx.Prepare("INSERT INTO posts (filename, filetype, created_at) VALUES (?, ?, ?)")
 	if err != nil {
 		println("Error in post creation: " + err.Error())
 	}
 	_, err = q.Exec(post.FileName, post.FileType, time.Now().UTC().Format(time.RFC3339))
+	if err != nil {
+		println("Error in post transaction: " + err.Error())
+	}
 
 	err = tx.Commit()
 
