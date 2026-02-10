@@ -3,6 +3,8 @@ import {useEffect, useState} from "react";
 import Image from "next/image";
 import Search from "../../components/sidebar/search";
 import {SearchType} from "../../constants/enums";
+import Dashboard from "../../components/dashboard/dashboard";
+import Link from "next/link";
 
 export default function Post() {
     const router = useRouter();
@@ -38,6 +40,20 @@ export default function Post() {
 
     return (
         <>
+            <div className={"grid grid-cols-[10%_90%] dark:bg-slate-800"}>
+                <Link href="/">
+                    <Image src="/images/Al_Sneed.png" alt={"Sneedem Feedem!"} width={100} height={100} className={"justify-center"} />
+                </Link>
+                <div>
+                    <p className={"text-orange-700 dark:text-emerald-200"} >
+                        Welcome to Localbooru!
+                    </p>
+                    <Link href="/posts">
+                        <p>All Posts</p>
+                    </Link>
+                </div>
+
+            </div>
             <div>
                 <h1>
                     Hello {id}!

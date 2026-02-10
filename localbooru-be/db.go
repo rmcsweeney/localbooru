@@ -47,13 +47,16 @@ func (r *SqlPostRepository) AddTagToPost(ctx context.Context, postId int, tagNam
 func (r *SqlPostRepository) CreatePost(ctx context.Context, post *Post) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error creating post: " + err.Error())
 	}
 	q, err := tx.Prepare("INSERT INTO posts (filename, filetype, created_at) VALUES (?, ?, ?)")
 	if err != nil {
 		println("Error in post creation: " + err.Error())
 	}
 	_, err = q.Exec(post.FileName, post.FileType, time.Now().UTC().Format(time.RFC3339))
+	if err != nil {
+		println("Error in post transaction: " + err.Error())
+	}
 
 	err = tx.Commit()
 

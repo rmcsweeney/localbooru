@@ -65,9 +65,14 @@ export default function Post() {
             <Link href="/">
                 <Image src="/images/Al_Sneed.png" alt={"Sneedem Feedem!"} width={100} height={100} className={"justify-center"} />
             </Link>
-            <p className={"text-orange-700 dark:text-emerald-200"} >
-                Welcome to Localbooru!
-            </p>
+            <div>
+                <p className={"text-orange-700 dark:text-emerald-200"} >
+                    Welcome to Localbooru!
+                </p>
+                <Link href="/posts">
+                    <p>All Posts</p>
+                </Link>
+            </div>
         </div>
         <div className={"grid grid-cols-[20%_80%]"}>
             <div className={"m-1"}>

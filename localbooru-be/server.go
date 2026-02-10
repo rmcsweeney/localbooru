@@ -31,6 +31,7 @@ func main() {
 		println("Issue with config: " + cfgErr.Error())
 		return
 	}
+	log.Println("Config OK. Starting server...")
 
 	mux := http.NewServeMux()
 	if config.UseMockDB {
@@ -63,7 +64,7 @@ func getRecentPosts(w http.ResponseWriter, r *http.Request) {
 	res, _ := repository.posts.GetRecentPosts(r.Context(), loadSize, offset)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -75,7 +76,7 @@ func getPostsByTag(w http.ResponseWriter, r *http.Request) {
 	res, _ := repository.posts.GetPostsByTag(r.Context(), tag)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -100,7 +101,7 @@ func getNPosts(w http.ResponseWriter, r *http.Request) {
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -139,7 +140,7 @@ func getPostById(w http.ResponseWriter, r *http.Request) {
 	println(res)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 	r.Close = true
@@ -188,7 +189,7 @@ func getTopTags(w http.ResponseWriter, r *http.Request) {
 	setResponseHeaders(w)
 	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		println(err)
+		println(err.Error())
 		return
 	}
 }
